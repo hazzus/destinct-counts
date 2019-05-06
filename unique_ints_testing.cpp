@@ -83,6 +83,7 @@ TEST(unique_cases, check_empty) {
     int b[] = {};
     size_t res = unique_ints(0, a, 0, b);
     EXPECT_EQ(res, 0);
+    EXPECT_EQ(res, unique_ints({}, {}));
 }
 
 TEST(unique_cases, check_sorted) {
@@ -107,10 +108,10 @@ void build_randomized(std::vector<int>& a, std::vector<int>& b, size_t mod) {
     b.resize(static_cast<size_t>(std::rand()) % mod);
     std::hash<size_t> hash_fn;
     for (size_t i = 0; i < a.size(); i++) {
-        a[i] = hash_fn(i);
+        a[i] = i;
     }
     for (size_t i = 0; i < b.size(); i++) {
-        b[i] = hash_fn(hash_fn(i));
+        b[i] = hash_fn(i);
     }
     std::random_shuffle(a.begin(), a.end());
     std::random_shuffle(b.begin(), b.end());
@@ -125,7 +126,7 @@ TEST(randomize, small_random) {
 }
 
 TEST(randomize, middle_random) {
-    for (size_t i = 0; i < 100; i++) {
+    for (size_t i = 0; i < 1000; i++) {
         std::vector<int> a, b;
         build_randomized(a, b, 1000);
         EXPECT_EQ(unique_ints(a, b), stupid(a, b));
@@ -133,9 +134,10 @@ TEST(randomize, middle_random) {
 }
 
 TEST(randomize, large_random) {
-    for (size_t i = 0; i < 10; i++) {
+    for (size_t i = 0; i < 1000; i++) {
         std::vector<int> a, b;
         build_randomized(a, b, 10000);
         EXPECT_EQ(unique_ints(a, b), stupid(a, b));
+        EXPECT_EQ(unique_ints(a, b), unique_ints(a.size(), a.data(), b.size(), b.data()));
     }
 }
