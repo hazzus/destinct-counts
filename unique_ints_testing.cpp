@@ -120,7 +120,7 @@ TEST(randomize, small_random) {
     for (size_t i = 0; i < 100; i++) {
         std::vector<int> a, b;
         build_randomized(a, b, 100);
-        EXPECT_EQ(unique_ints(a.size(), a.data(), b.size(), b.data()), stupid(a, b));
+        EXPECT_EQ(unique_ints(a, b), stupid(a, b));
     }
 }
 
@@ -128,7 +128,7 @@ TEST(randomize, middle_random) {
     for (size_t i = 0; i < 100; i++) {
         std::vector<int> a, b;
         build_randomized(a, b, 1000);
-        EXPECT_EQ(unique_ints(a.size(), a.data(), b.size(), b.data()), stupid(a, b));
+        EXPECT_EQ(unique_ints(a, b), stupid(a, b));
     }
 }
 
@@ -136,6 +136,6 @@ TEST(randomize, large_random) {
     for (size_t i = 0; i < 10; i++) {
         std::vector<int> a, b;
         build_randomized(a, b, 10000);
-        EXPECT_EQ(unique_ints(a.size(), a.data(), b.size(), b.data()), stupid(a, b));
+        EXPECT_EQ(unique_ints(a, b), stupid(a, b));
     }
 }
