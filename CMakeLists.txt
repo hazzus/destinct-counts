@@ -11,5 +11,7 @@ add_executable(testing
     gtest/gtest.h
     gtest/gtest_main.cc)
 
+# add_executable(algo algo.cpp unique_ints.hpp)
+add_executable(structure structure.cpp unique_ints.hpp)
 
 target_link_libraries(testing -lgmp -lgmpxx -lpthread)
