@@ -3,9 +3,12 @@
 
 #include <algorithm>
 #include <bitset>
-#include <cmath>
 #include <cstdint>
+#include <limits>
+#include <math.h>
 #include <vector>
+
+#include "murmurhash/murmurhash.h"
 
 size_t unique_ints(size_t small_length, int* small, size_t big_length,
                    int* big) {
@@ -80,6 +83,60 @@ template <std::size_t space = 32> class linear_counter {
     std::bitset<length> data;
 };
 
-using uniq_counter = linear_counter<>;
+template <uint8_t bits = 15> struct hyperloglog_counter {
+    hyperloglog_counter() : data(m, 0), zeroes(m) {}
+
+    void add(int x) {
+        // murmur showing it's best, nothing else works
+        uint32_t hash = mur.hash(x);
+        uint32_t j = hash >> (type_length - bits);
+        uint32_t w = hash << bits;
+        if (data[j] == 0) {
+            zeroes--;
+        }
+        // compile on gcc please, using gcc builtins
+        data[j] =
+            std::max<uint8_t>(data[j], (w == 0 ? bits : __builtin_clz(w)) + 1);
+    }
+
+    int get_uniq_num() const {
+        long double estimated = estimate();
+        if (estimated <= 5.0 * m / 2.0 && zeroes != 0) {
+            // fixing error for small range (actually linear counter)
+            estimated = m * std::log(static_cast<double>(m) / zeroes);
+        }
+        long double power = 1ull << 32;
+        if (estimated > power / 30) {
+            // fixing error for huge range
+            estimated = -power * std::log(1 - estimated / power);
+        }
+        return static_cast<int>(std::round(estimated));
+    }
+
+  private:
+    long double estimate() const {
+        long double sum = 0;
+        for (size_t i = 0; i < m; i++) {
+            sum += 1.0 / static_cast<long double>(1ull << data[i]);
+        }
+        long double result = alpha * m * m / sum;
+        return result;
+    }
+
+  private:
+    static const unsigned long long m = 1u << bits;
+    static const uint8_t type_length = 32;
+
+    // alpha constant maybe should be changed for smaller bucket sizes, but
+    // still
+    constexpr static long double alpha =
+        0.7213 / (1 + 1.079 / static_cast<long double>(m));
+
+    murmurhash mur;
+    std::vector<uint8_t> data;
+    unsigned long long zeroes;
+};
+
+using uniq_counter = hyperloglog_counter<>;
 
 #endif // UNIQUE_INTS

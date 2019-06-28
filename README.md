@@ -35,7 +35,10 @@
 Ваш класс должен использовать не более 32 Кб памяти. 
 
 ### Описание алгоритма
-Используется Linear Probability Counter. Описан в этой статье: http://algo.inria.fr/flajolet/Publications/src/FlMa85.pdf
+Используется HyperLogLog Algorithm. Описан в этой статье: http://algo.inria.fr/flajolet/Publications/FlFuGaMe07.pdf
+
+Так же описан Linear Probability Counter. Описан в этой статье: http://algo.inria.fr/flajolet/Publications/src/FlMa85.pdf
+
 
 ### Альтернативы:
-MinCount, LogLog, HyperLogLog, но у них хоть и меньше расход памяти, но больше вероятность ошибки, судя по научным статьям.
+MinCount, LogLog, но у них хоть и меньше расход памяти, но они менее прогрессивны и больше ошибаются.
